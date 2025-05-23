@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Academia Pro</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to right, #007BFF, #00c6ff);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .dark-mode {
+      background: #1a1a1a;
+      color: #ddd;
+    }
+    .container {
+      max-width: 960px;
+      margin: auto;
+      padding: 30px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      margin-top: 40px;
+    }
+    .dark-mode .container {
+      background: #2a2a2a;
+    }
+    h2, h3 {
+      text-align: center;
+      color: #007BFF;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .tab {
+      display: none;
+    }
+    .tab.active {
+      display: block;
+    }
+    .tab-buttons {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .tab-buttons button {
+      width: auto;
+      margin: 0 5px;
+      padding: 10px 15px;
+    }
+    .alert {
+      color: red;
+      font-weight: bold;
+    }
+    #logoutBtn, #toggleDark {
+      display: block;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+  <button id="toggleDark">🌙 Alternar Modo</button>
+  <div class="container">
+    <section class="login">
+      <h2>Login do Sistema</h2>
+      <form id="loginForm">
+        <input type="text" id="loginNome" placeholder="Usuário" required />
+        <input type="password" id="loginSenha" placeholder="Senha" required />
+        <button type="submit">Entrar</button>
+      </form>
+    </section>
+
+    <section id="painel" style="display:none;">
+      <button id="logoutBtn">Sair</button>
+      <div class="tab-buttons">
+        <button onclick="mostrarAba('cliente')">Painel do Cliente</button>
+        <button onclick="mostrarAba('gestora')">Painel da Gestora</button>
+      </div>
+
+      <!-- CLIENTE -->
+      <div id="cliente" class="tab">
+        <h2>👤 Cliente</h2>
+        <div>
+          <h3>📄 Dados Pessoais</h3>
+          <p>Nome: João da Silva</p>
+          <p>Plano: Mensal</p>
+          <p>Vencimento: 10/06/2025</p>
+        </div>
+
+        <div>
+          <h3>📆 Frequência</h3>
+          <ul>
+            <li>20/05/2025 - 17:30</li>
+            <li>21/05/2025 - 17:33</li>
+            <li>22/05/2025 - 17:40</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>🏋️ Plano de Treino</h3>
+          <ul>
+            <li>Segunda: Peito e Tríceps</li>
+            <li>Terça: Costas e Bíceps</li>
+            <li>Quarta: Pernas</li>
+            <li>Quinta: Ombro e Abdômen</li>
+            <li>Sexta: Livre</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>📊 Avaliação Física</h3>
+          <p>Peso: 74kg | Altura: 1,75m | IMC: 24,2 | Gordura: 15%</p>
+        </div>
+
+        <div>
+          <h3>📈 Progresso</h3>
+          <canvas id="graficoProgresso" height="150"></canvas>
+        </div>
+
+        <div>
+          <h3>📨 Mensagem à Gestora</h3>
+          <textarea placeholder="Escreva sua mensagem..."></textarea>
+          <button>Enviar</button>
+        </div>
+
+        <div>
+          <h3>📅 Agendar Treino</h3>
+          <input type="date" />
+          <input type="time" />
+          <button>Agendar</button>
+        </div>
+
+        <p class="alert">⚠️ Seu plano vence em breve: 10/06/2025</p>
+      </div>
+
+      <!-- GESTORA -->
+      <div id="gestora" class="tab">
+        <h2>📋 Painel da Gestora</h2>
+        <input type="text" placeholder="Buscar cliente..." />
+        <button>🔍 Buscar</button>
+        <button>➕ Novo Cliente</button>
+        <button>📁 Exportar Dados</button>
+        <p>Total de alunos ativos: 45</p>
+        <p>Próximos vencimentos: 15</p>
+        <!-- Futuro: Tabela de clientes -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const toggleDark = document.getElementById('toggleDark');
+    toggleDark.onclick = () => document.body.classList.toggle('dark-mode');
+
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      document.querySelector(".login").style.display = "none";
+      document.getElementById("painel").style.display = "block";
+      mostrarAba('cliente');
+    });
+
+    document.getElementById("logoutBtn").onclick = () => {
+      document.querySelector(".login").style.display = "block";
+      document.getElementById("painel").style.display = "none";
+    };
+
+    function mostrarAba(aba) {
+      document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
+      document.getElementById(aba).classList.add("active");
+    }
+
+    // Gráfico
+    const ctx = document.getElementById('graficoProgresso').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
+        datasets: [{
+          label: 'Peso (kg)',
+          data: [80, 78, 77, 75, 74],
+          borderColor: '#007BFF',
+          fill: false
+        }]
+      },
+      options: { responsive: true }
+    });
+  </script>
+</body>
+  </html>
+  
